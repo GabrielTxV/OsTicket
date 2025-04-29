@@ -36,5 +36,63 @@ GRANT ALL PRIVILEGES ON osticket.* TO 'ostuser'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
+## Baixar e Configurar o osTicket
+```
+cd /tmp
+wget https://github.com/osTicket/osTicket/releases/download/v1.18.1/osTicket-v1.18.1.zip
+unzip osTicket-v1.18.1.zip
+sudo mv upload /var/www/html/osticket
+```
+### Configurar permissões
+```
+cd /var/www/html/osticket/include
+sudo cp ost-sampleconfig.php ost-config.php
+sudo chown -R www-data:www-data /var/www/html/osticket
+sudo chmod 0666 /var/www/html/osticket/include/ost-config.php
+```
+## Configurar Virtual Host do Apache
+```
+sudo nano /etc/apache2/sites-available/osticket.conf
+```
+```
+<VirtualHost *:80>
+    ServerAdmin admin@seudominio.com
+    DocumentRoot /var/www/html/osticket
+    ServerName osticket.local
 
+    <Directory /var/www/html/osticket>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/osticket_error.log
+    CustomLog ${APACHE_LOG_DIR}/osticket_access.log combined
+</VirtualHost>
+```
+### Habilitar site e módulos
+```
+sudo a2ensite osticket.conf
+sudo a2enmod rewrite
+sudo systemctl reload apache2
+```
+## Finalizar instalação pelo navegador
+### Acessar pelo navegador
+```
+http://SEU_IP/osticket
+```
+## Após instalação
+### Remover pasta de instalação e ajustar permissões
+```
+sudo rm -rf /var/www/html/osticket/setup
+sudo chmod 0644 /var/www/html/osticket/include/ost-config.php
+```
+### Para acesso do admin com usuário e senha cadastrados
+```
+http://SEU-IP/osticket/scp
+```
+### Para usuário final
+```
+http://SEU-IP/osticket
+```
 
